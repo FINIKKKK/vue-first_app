@@ -1,31 +1,19 @@
 <template>
   <div class="app">
-    <form @submit.prevent>
-      <h2>Создать пост</h2>
-      <input
-        v-bind:value="title"
-        @input="title = $event.target.value"
-        type="text"
-        placeholder="Название"
-      />
-      <textarea
-        v-bind:value="body"
-        @input="body = $event.target.value"
-        placeholder="Описание"
-      ></textarea>
-      <button type="submit" @click="onCreatePost">Создать</button>
-    </form>
-
-    <h2>Посты</h2>
-    <div class="post" v-for="post in posts">
-      <h3><strong>Название: </strong>{{ post.title }}</h3>
-      <p><strong>Описание: </strong>{{ post.body }}</p>
-    </div>
+    <PostForm @create="onCreatePost" />
+    <PostList :posts="posts" @remove="onRemovePost" />
   </div>
 </template>
 
 <script>
+import PostList from "@/components/PostList";
+import PostForm from "@/components/PostForm";
+
 export default {
+  components: {
+    PostList,
+    PostForm,
+  },
   data() {
     return {
       posts: [
@@ -44,15 +32,11 @@ export default {
     onChangeBody(e) {
       this.body = e.targer.value;
     },
-    onCreatePost() {
-      const post = {
-        id: Date.now(),
-        title: this.title,
-        body: this.body,
-      };
+    onCreatePost(post) {
       this.posts.push(post);
-      this.title = "";
-      this.body = "";
+    },
+    onRemovePost(id) {
+      this.posts = this.posts.filter((obj) => obj.id !== id);
     },
   },
 };
@@ -64,46 +48,13 @@ export default {
   padding: 0;
   box-sizing: border-box;
 }
-
+button {
+  cursor: pointer;
+}
 .app {
   padding: 20px;
 }
 h2 {
   margin-bottom: 15px;
-}
-.post {
-  margin-bottom: 20px;
-  border: 2px solid teal;
-  padding: 20px 20px;
-  border-radius: 15px;
-}
-.post h3 {
-  margin-bottom: 10px;
-}
-
-form {
-  margin-bottom: 70px;
-  input,
-  textarea {
-    width: 100%;
-    border: 2px solid teal;
-    border-radius: 15px;
-    padding: 12px;
-    margin-bottom: 15px;
-  }
-  textarea {
-    height: 100px;
-    resize: none;
-  }
-  button {
-    background-color: teal;
-    padding: 12px 55px;
-    color: #fff;
-    border: none;
-    border-radius: 15px;
-  }
-}
-form h3 {
-  margin-bottom: 10px;
 }
 </style>
