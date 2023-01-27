@@ -1,14 +1,13 @@
 <template>
   <div v-if="posts.length > 0">
-    <div class="list__header">
-      <h2>Посты</h2>
-    </div>
-    <PostItem
-      v-for="post in posts"
-      :post="post"
-      :key="post.id"
-      @remove="$emit('remove', post.id)"
-    />
+    <transition-group name="posts">
+      <PostItem
+        v-for="post in posts"
+        :post="post"
+        :key="post.id"
+        @remove="$emit('remove', post.id)"
+      />
+    </transition-group>
   </div>
   <h2 v-else>Список постов пуст</h2>
 </template>
@@ -22,18 +21,26 @@ export default {
     posts: { type: Array, required: true },
     sortItems: { type: Array, required: true },
   },
-  methods: {
-  
-  },
+  methods: {},
 };
 </script>
 
 <style scoped lang="scss">
-.list__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 15px;
+.posts-item {
+  display: inline-block;
+  margin-right: 10px;
+}
+.posts-enter-active,
+.posts-leave-active {
+  transition: all 0.3s ease;
+}
+.posts-enter-from,
+.posts-leave-to {
+  opacity: 0;
+  transform: translateX(100px);
+}
+.posts-move {
+  transition: transform 0.8s ease;
 }
 .post {
   margin-bottom: 20px;

@@ -1,10 +1,29 @@
 <template>
   <div class="app">
     <PostForm @create="onCreatePost" />
-    <Select :options="options" v-model="selectedOption" />
+
+    <Input v-model="searchValue" placeholder="Поиск..."
+    :style="{marginBottom: 50 + 'px'}" />
+
+    <div class="list__header">
+      <h2>Посты</h2>
+      <Select :options="options" v-model="selectedOption" />
+    </div>
 
     <PostList :posts="posts" @remove="onRemovePost" v-if="!isLoading" />
     <div v-else>Идет загрузка...</div>
+
+    <div class="pagination">
+      <div
+        class="item"
+        v-for="item in totalPages"
+        :key="item"
+        :class="{ current: page === item }"
+        @click="changePage(item)"
+      >
+        {{ item }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -35,6 +54,10 @@ export default {
         },
       ],
       selectedOption: "",
+      searchValue: "",
+      limit: 10,
+      page: 1,
+      totalPages: 0,
     };
   },
   methods: {
@@ -53,10 +76,19 @@ export default {
     async fetchPosts() {
       try {
         this.isLoading = true;
-        const { data } = await axios.get(
-          "https://jsonplaceholder.typicode.com/posts?_limit=10"
+        const response = await axios.get(
+          "https://jsonplaceholder.typicode.com/posts",
+          {
+            params: {
+              _limit: this.limit,
+              _page: this.page,
+            },
+          }
         );
-        this.posts = data;
+        this.totalPages = Math.ceil(
+          response.headers["x-total-count"] / this.limit
+        );
+        this.posts = response.data;
       } catch (err) {
         console.warn(err);
         alert("Ошибка при получении постов");
@@ -67,6 +99,9 @@ export default {
     onSelectedOption(e) {
       this.selectedOption = e.target.value;
     },
+    changePage(item) {
+      this.page = item;
+      },
   },
   mounted() {
     this.fetchPosts();
@@ -77,6 +112,15 @@ export default {
         return post1[value]?.localeCompare(post2[value]);
       });
     },
+    searchValue(value) {
+      console.log(value);
+      this.posts = this.posts.filter((obj) =>
+        obj.title.toLowerCase().includes(value)
+      );
+    },
+    page() {
+      this.fetchPosts();
+    }
   },
 };
 </script>
@@ -95,5 +139,27 @@ button {
 }
 h2 {
   margin-bottom: 15px;
+}
+.list__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.pagination {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .item:not(:last-child) {
+    margin-right: 15px;
+  }
+  .item {
+    cursor: pointer;
+  }
+  .current {
+    font-weight: 700;
+  }
 }
 </style>

@@ -1,5 +1,6 @@
 <template>
   <div class="post">
+    <div>{{ post.id }}</div>
     <h3><strong>Название: </strong>{{ post.title }}</h3>
     <p><strong>Описание: </strong>{{ post.body }}</p>
     <Button class="btn" type="submit" @click="$emit('remove', post.id)"
@@ -22,6 +23,7 @@ export default {
 <style scoped>
 .post {
   position: relative;
+  background-color: #fff;
 }
 .btn {
   position: absolute;
