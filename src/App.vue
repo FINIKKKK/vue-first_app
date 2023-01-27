@@ -1,13 +1,17 @@
 <template>
   <div class="app">
     <PostForm @create="onCreatePost" />
-    <PostList :posts="posts" @remove="onRemovePost" />
+    <Select :options="options" v-model="selectedOption" />
+
+    <PostList :posts="posts" @remove="onRemovePost" v-if="!isLoading" />
+    <div v-else>Идет загрузка...</div>
   </div>
 </template>
 
 <script>
 import PostList from "@/components/PostList";
 import PostForm from "@/components/PostForm";
+import axios from "axios";
 
 export default {
   components: {
@@ -16,13 +20,21 @@ export default {
   },
   data() {
     return {
-      posts: [
-        { id: 1, title: "Пост 1", body: "Описание 1" },
-        { id: 2, title: "Пост 2", body: "Описание 2" },
-        { id: 3, title: "Пост 3", body: "Описание 3" },
-      ],
+      posts: [],
       title: "",
       body: "",
+      isLoading: false,
+      options: [
+        {
+          value: "title",
+          name: "По названию",
+        },
+        {
+          value: "body",
+          name: "По описанию",
+        },
+      ],
+      selectedOption: "",
     };
   },
   methods: {
@@ -37,6 +49,33 @@ export default {
     },
     onRemovePost(id) {
       this.posts = this.posts.filter((obj) => obj.id !== id);
+    },
+    async fetchPosts() {
+      try {
+        this.isLoading = true;
+        const { data } = await axios.get(
+          "https://jsonplaceholder.typicode.com/posts?_limit=10"
+        );
+        this.posts = data;
+      } catch (err) {
+        console.warn(err);
+        alert("Ошибка при получении постов");
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    onSelectedOption(e) {
+      this.selectedOption = e.target.value;
+    },
+  },
+  mounted() {
+    this.fetchPosts();
+  },
+  watch: {
+    selectedOption(value) {
+      this.posts.sort((post1, post2) => {
+        return post1[value]?.localeCompare(post2[value]);
+      });
     },
   },
 };

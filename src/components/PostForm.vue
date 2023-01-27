@@ -1,9 +1,13 @@
 <template>
   <form @submit.prevent>
-    <h2>Создать пост</h2>
-    <Input v-model="post.title" placeholder="Название" />
-    <Input v-model="post.body" placeholder="Описание" />
-    <Button type="submit" @click="onCreatePost">Создать</Button>
+    <Button @click="this.visible = true">Создать пост</Button>
+
+    <Popup v-if="visible" @close="this.visible = false">
+      <h2>Создать пост</h2>
+      <Input v-model="post.title" placeholder="Название" />
+      <Input v-model="post.body" placeholder="Описание" />
+      <Button type="submit" @click="onCreatePost">Создать</Button>
+    </Popup>
   </form>
 </template>
 
@@ -15,6 +19,7 @@ export default {
         title: "",
         body: "",
       },
+      visible: false,
     };
   },
   methods: {
@@ -25,6 +30,7 @@ export default {
         title: "",
         body: "",
       };
+      this.visible = false;
     },
   },
 };
