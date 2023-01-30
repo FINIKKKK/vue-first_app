@@ -4,7 +4,7 @@
 
     <Popup v-if="visible" @close="this.visible = false">
       <h2>Создать пост</h2>
-      <Input v-model="post.title" placeholder="Название" />
+      <Input v-focus v-model="post.title" placeholder="Название" />
       <Input v-model="post.body" placeholder="Описание" />
       <Button type="submit" @click="onCreatePost">Создать</Button>
     </Popup>
